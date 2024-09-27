@@ -3,7 +3,6 @@ import random
 import string
 from django.db import models
 from visitor.mixins import EncryptedFieldMixin
-# from auth_app.models import SwarnaBoomiUser
 
 class VisitorTable(models.Model):
     PROOF_TYPE_CHOICES = [
@@ -19,13 +18,12 @@ class VisitorTable(models.Model):
         (2, 'Rejected'),
     ]
 
-    # user = models.ForeignKey(SwarnaBoomiUser, on_delete=models.CASCADE, null=True, blank=True)
     gatepass_id = models.CharField(unique=True, editable=False, max_length=20, null=True)
     place_of_visit = models.CharField(max_length=50)
     name = models.CharField(max_length=225, null=True)
     age = models.IntegerField(null=True)
     gender = models.CharField(max_length=50)
-    mobile = models.BigIntegerField(blank=True)
+    mobile = models.CharField(max_length=15, blank=True)  # Change to CharField
     email = models.EmailField()
     address = models.TextField()
     photo = models.FileField(upload_to='profile/', null=True, blank=True)
@@ -37,7 +35,7 @@ class VisitorTable(models.Model):
     visit_person = models.CharField(max_length=225, null=True)
     in_time = models.TimeField(auto_now_add=True)
     out_time = models.TimeField(null=True, blank=True)
-    visiting_mobile = models.CharField(max_length=225, null=True)
+    visiting_mobile = models.CharField(max_length=15, null=True)  # Change to CharField
     date = models.DateField()
     extra_visitor = models.IntegerField()
     has_vehicle = models.BooleanField(default=False)
@@ -55,10 +53,10 @@ class VisitorTable(models.Model):
         if not self.gatepass_id:
             self.gatepass_id = self.generate_gatepass_id()
 
-        # Encrypt fields
+        # Encrypt fields, converting integers to strings
         self.name = EncryptedFieldMixin().encrypt(self.name)
-        self.mobile = EncryptedFieldMixin().encrypt(self.mobile)
-        self.visiting_mobile = EncryptedFieldMixin().encrypt(self.visiting_mobile)
+        self.mobile = EncryptedFieldMixin().encrypt(self.mobile)  # Keep as string for encryption
+        self.visiting_mobile = EncryptedFieldMixin().encrypt(self.visiting_mobile)  # Keep as string
         self.visit_person = EncryptedFieldMixin().encrypt(self.visit_person)
         self.address = EncryptedFieldMixin().encrypt(self.address)
 
@@ -69,15 +67,9 @@ class VisitorTable(models.Model):
 
     def __str__(self):
         return f"{self.name} ({self.gatepass_id})"
-    
-
-
-
 
 class Rfid_Register(models.Model):
     rfid_number = models.CharField(max_length=50, unique=True)
-    # user = models.ForeignKey(SwarnaBoomiUser, on_delete=models.CASCADE)
-    # Add other relevant fields
 
     def __str__(self):
         return self.rfid_number
